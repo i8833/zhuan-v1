@@ -1,0 +1,45 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-primary: #4caf50;
+  --color-secondary: #f0f0f0;
+  --color-text: #333;
+  --color-white: #fff;
+  --color-black: #000;
+  --color-gray: #ccc;
+  --color-dark-gray: #777;
+  --color-error: #f44336;
+  --color-success: #4caf50;
+  --color-warning: #ffeb3b;
+  --color-info: #2196f3;
+  --font-family-primary: 'Arial', sans-serif;
+  --font-family-secondary: 'Helvetica', sans-serif;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-sm: 14px;
+  --font-size-xs: 12px;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  --line-height-base: 1.5;
+  --line-height-lg: 1.6;
+  --line-height-sm: 1.4;
+  --border-radius-base: 4px;
+  --border-radius-lg: 8px;
+  --border-radius-sm: 2px;
+  --spacing-base: 10px;
+  --spacing-lg: 20px;
+  --spacing-sm: 5px;
+  --spacing-xs: 2px;
+  --shadow-base: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --transition-base: all 0.3s ease;
+  --transition-lg: all 0.5s ease;
+  --transition-sm: all 0.2s ease;
+}
