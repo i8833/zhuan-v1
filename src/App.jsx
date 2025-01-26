@@ -15,6 +15,8 @@ function App() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
   const [showToolbar, setShowToolbar] = useState(true);
+  const [exportTransparentBg, setExportTransparentBg] = useState(false); // 控制导出透明背景
+  const [exportFileName, setExportFileName] = useState('画布导出'); // 导出文件名
   const [isScaling, setIsScaling] = useState(false);
   const [scaleStartDistance, setScaleStartDistance] = useState(0);
   const canvasRef = useRef(null);
@@ -34,6 +36,15 @@ function App() {
   const handleBackgroundColorChange = (e) => {
     setBackgroundColor(e.target.value);
   };
+
+  const handleExportTransparentBgChange = (e) => {
+    setExportTransparentBg(e.target.checked);
+  };
+
+  const handleExportFileNameChange = (e) => {
+    setExportFileName(e.target.value);
+  };
+
 
   const handleFontChange = (e) => {
     setSelectedFont(e.target.value);
@@ -116,8 +127,8 @@ function App() {
                 ...image,
                 width: newWidth,
                 height: newHeight,
-                x: image.x - (newWidth - image.width) / 2, // 保持中心位置不变
-                y: image.y - (newHeight - image.height) / 2, // 保持中心位置不变
+                x: image.x - (newWidth - image.width) / 2,
+                y: image.y - (newHeight - image.height) / 2,
               }
             : image
         )
@@ -152,7 +163,7 @@ function App() {
           };
           setImages([...images, newImage]);
           setSelectedImageIndex(images.length);
-          setSelectedTextIndex(null); // Select image, deselect text
+          setSelectedTextIndex(null);
         };
         img.src = event.target.result;
       };
@@ -270,6 +281,71 @@ function App() {
     setIsScaling(false);
   };
 
+  const handleExportCanvas = () => {
+    const canvas = canvasRef.current;
+    let dataURL;
+    if (exportTransparentBg) {
+      // 导出透明背景
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvasWidth;
+      tempCanvas.height = canvasHeight;
+      const tempCtx = tempCanvas.getContext('2d');
+      // 注意：这里不需要填充背景色，保持透明
+
+      // 先绘制图片
+      images.forEach((image) => {
+        const img = new Image();
+        img.onload = () => {
+          tempCtx.drawImage(img, image.x, image.y, image.width, image.height);
+           // 再绘制文字
+          texts.forEach((text) => {
+            tempCtx.font = `${text.size}px ${text.font}`;
+            tempCtx.fillStyle = text.color;
+            tempCtx.textAlign = 'center';
+            tempCtx.textBaseline = 'middle';
+            tempCtx.fillText(text.content, text.x, text.y);
+          });
+          dataURL = tempCanvas.toDataURL('image/png');
+          downloadImage(dataURL, exportFileName);
+        };
+        img.src = image.src;
+      });
+    } else {
+      // 导出非透明背景
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+       // 先绘制图片
+      images.forEach((image) => {
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, image.x, image.y, image.width, image.height);
+           // 再绘制文字
+          texts.forEach((text) => {
+            ctx.font = `${text.size}px ${text.font}`;
+            ctx.fillStyle = text.color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text.content, text.x, text.y);
+          });
+          dataURL = canvas.toDataURL('image/png');
+          downloadImage(dataURL, exportFileName);
+        };
+        img.src = image.src;
+      });
+    }
+  };
+
+  const downloadImage = (dataURL, filename) => {
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = `${filename}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+
   const handleDeleteText = () => {
     if (selectedTextIndex !== null) {
       const newTexts = texts.filter((_, index) => index !== selectedTextIndex);
@@ -290,23 +366,23 @@ function App() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight); // Clear canvas before each render
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+    // 先绘制图片
     images.forEach((image) => {
       const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, image.x, image.y, image.width, image.height);
-      };
+      img.onload = () => { ctx.drawImage(img, image.x, image.y, image.width, image.height); };
       img.src = image.src;
     });
 
+    // 后绘制文字
     texts.forEach((text) => {
       ctx.font = `${text.size}px ${text.font}`;
       ctx.fillStyle = text.color;
-      ctx.textAlign = 'center'; // 水平居中
-      ctx.textBaseline = 'middle'; // 垂直居中
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
       ctx.fillText(text.content, text.x, text.y);
     });
   }, [canvasWidth, canvasHeight, backgroundColor, texts, images]);
@@ -342,6 +418,24 @@ function App() {
               <input type="number" value={canvasHeight} onChange={handleCanvasHeightChange} />
               <label>背景颜色:</label>
               <input type="color" value={backgroundColor} onChange={handleBackgroundColorChange} />
+            </div>
+          </div>
+          <div className="toolbar-section">
+            <h2>导出设置</h2>
+            <div className="toolbar-group">
+              <label>文件名:</label>
+              <input type="text" value={exportFileName} onChange={handleExportFileNameChange} />
+            </div>
+            <div className="toolbar-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={exportTransparentBg}
+                  onChange={handleExportTransparentBgChange}
+                />
+                透明背景
+              </label>
+              <button onClick={handleExportCanvas}>导出画布</button>
             </div>
           </div>
 
@@ -403,8 +497,12 @@ function App() {
                   value={texts[selectedTextIndex].align}
                   onChange={handleTextAlignChange}
                 >
-                  <option value="horizontal">水平</option>
-                  <option value="vertical">垂直</option>
+                  <option value="horizontal">
+                    水平
+                  </option>
+                  <option value="vertical">
+                    垂直
+                  </option>
                 </select>
               </div>
             ) : null}
@@ -413,7 +511,9 @@ function App() {
           <div className="toolbar-section">
             <h2>图片工具</h2>
             <div className="toolbar-group">
-              <button onClick={() => imageInputRef.current.click()}>添加图片</button>
+              <button onClick={() => imageInputRef.current.click()}>
+                添加图片
+              </button>
               <input
                 type="file"
                 style={{ display: 'none' }}
