@@ -5,8 +5,8 @@ export const localFonts = [
   { name: '汉仪篆书', path: '/fonts/hyzs.ttf' },
   { name: '九叠篆', path: '/fonts/jdz.ttf' }, 
   { name: '甲骨文', path: '/fonts/jgw.ttf' },
-  { name: '玉筋隶书', path: '/fonts/HYYuJinLi.ttf' },
-  { name: '华光繁隶书', path: '/fonts/hgfl.ttf' },
+  { name: '玉筋隶书', path: '/fonts/yjl.ttf' },
+  
 
  // { name: '方正小篆', path: '/fonts/fangzheng.ttf' },
  // { name: '繁篆', path: '/fonts/fanzhuan.ttf' },
