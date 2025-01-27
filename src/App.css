@@ -1,173 +1,201 @@
 body,
-html {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  font-family: 'Arial', sans-serif;
-  background-color: #f0f0f0;
-}
+    html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f0f0;
+    }
 
-.app-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-}
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+    }
 
-.edit-area {
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 375px;
-  height: auto;
-  margin: 0 auto;
-  z-index: 1;
-  overflow: hidden;
-}
+    .edit-area {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 375px;
+      height: auto;
+      margin: 0 auto;
+      z-index: 1;
+      overflow: hidden;
+    }
 
-canvas {
-  border: 1px solid #000;
-  width: 100%;
-  height: auto;
-}
+    canvas {
+      border: 1px solid #000;
+      width: 100%;
+      height: auto;
+    }
 
-.toolbar-toggle {
-  margin-top: 620px;
-  margin-bottom: 10px;
-  padding: 8px 16px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  z-index: 2;
-}
+    .toolbar-toggle {
+      margin-top: 620px;
+      margin-bottom: 10px;
+      padding: 8px 16px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      z-index: 2;
+    }
 
-.toolbar {
-  width: 100%;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  z-index: 2;
-}
+    .toolbar {
+      width: 100%;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 5px;
+      z-index: 2;
+    }
 
-.toolbar-section {
-  margin-bottom: 15px;
-}
+    .toolbar-section {
+      margin-bottom: 10px;
+    }
 
-.toolbar-title {
-  font-size: 1rem;
-  margin-bottom: 10px;
-}
+    .toolbar-title {
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+    }
 
-.toolbar-group {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+      flex-wrap: wrap;
+    }
 
-.toolbar-group label {
-  margin-right: 10px;
-  font-size: 0.9rem;
-}
+    .toolbar-group label {
+      margin-right: 5px;
+      font-size: 0.8rem;
+    }
 
-.toolbar-group input[type='number'],
-.toolbar-group input[type='color'],
-.toolbar-group select {
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-right: 10px;
-}
+    .toolbar-group input[type='number'],
+    .toolbar-group input[type='color'],
+    .toolbar-group select,
+    .toolbar-group input[type='file'] {
+      padding: 3px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-right: 5px;
+      font-size: 0.8rem;
+    }
 
-.toolbar-group input[type='number'] {
-  width: 60px;
-}
+    .toolbar-group input[type='file'] {
+      width: auto;
+    }
 
-.toolbar-group button {
-  padding: 6px 12px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
+    .toolbar-group input[type='number'] {
+      width: 50px;
+    }
 
-.toolbar-group button:hover {
-  background-color: #367c39;
-}
+    .toolbar-group button {
+      padding: 4px 8px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
 
-.toolbar-group p {
-  margin-left: 10px;
-  font-size: 0.8rem;
-  color: #777;
-}
+    .toolbar-group button:hover {
+      background-color: #367c39;
+    }
 
-@media (max-width: 480px) and (orientation: portrait) {
-  .app-container {
-    padding: 5px;
-  }
+    .toolbar-group p {
+      margin-left: 5px;
+      font-size: 0.7rem;
+      color: #777;
+    }
 
-  .edit-area {
-    margin-bottom: 10px;
-  }
+    .text-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
 
-  .toolbar-toggle {
-    margin-bottom: 5px;
-    padding: 6px 12px;
-    font-size: 0.9rem;
-  }
+    .text-controls > * {
+      margin-right: 5px;
+    }
 
-  .toolbar {
-    padding: 5px;
-  }
+    .export-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
 
-  .toolbar-section {
-    margin-bottom: 10px;
-  }
+    .export-controls > * {
+      margin-right: 5px;
+    }
 
-  .toolbar-group {
-    margin-bottom: 5px;
-  }
+    @media (max-width: 480px) and (orientation: portrait) {
+      .app-container {
+        padding: 5px;
+      }
 
-  .toolbar-group label {
-    font-size: 0.8rem;
-  }
+      .edit-area {
+        margin-bottom: 5px;
+      }
 
-  .toolbar-group input[type='number'],
-  .toolbar-group input[type='color'],
-  .toolbar-group select {
-    padding: 3px;
-    font-size: 0.8rem;
-  }
+      .toolbar-toggle {
+        margin-bottom: 5px;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+      }
 
-  .toolbar-group input[type='number'] {
-    width: 50px;
-  }
+      .toolbar {
+        padding: 5px;
+      }
 
-  .toolbar-group button {
-    padding: 4px 8px;
-    font-size: 0.8rem;
-  }
+      .toolbar-section {
+        margin-bottom: 10px;
+      }
 
-  .toolbar-group p {
-    font-size: 0.7rem;
-  }
+      .toolbar-group {
+        margin-bottom: 5px;
+      }
 
-  .toolbar-group {
-    flex-wrap: wrap;
-  }
+      .toolbar-group label {
+        font-size: 0.8rem;
+      }
 
-  .toolbar-group > * {
-    margin-bottom: 5px;
-  }
-}
+      .toolbar-group input[type='number'],
+      .toolbar-group input[type='color'],
+      .toolbar-group select,
+      .toolbar-group input[type='file'] {
+        padding: 3px;
+        font-size: 0.8rem;
+      }
+
+      .toolbar-group input[type='number'] {
+        width: 50px;
+      }
+
+      .toolbar-group button {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+      }
+
+      .toolbar-group p {
+        font-size: 0.7rem;
+      }
+
+      .toolbar-group {
+        flex-wrap: wrap;
+      }
+
+      .toolbar-group > * {
+        margin-bottom: 5px;
+      }
+    }

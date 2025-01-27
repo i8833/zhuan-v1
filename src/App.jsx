@@ -1,286 +1,187 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './App.css';
+    import './App.css';
 
-function App() {
-  const [selectedFont, setSelectedFont] = useState('Arial');
-  const [customFont, setCustomFont] = useState(null);
-  const [customFontName, setCustomFontName] = useState('');
-  const [texts, setTexts] = useState([]);
-  const [images, setImages] = useState([]);
-  const [selectedTextIndex, setSelectedTextIndex] = useState(null);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
-  const [showToolbar, setShowToolbar] = useState(true);
-  const [exportTransparentBg, setExportTransparentBg] = useState(false);
-  const [exportFileName, setExportFileName] = useState('画布导出');
-  const [isScaling, setIsScaling] = useState(false);
-  const [scaleStartDistance, setScaleStartDistance] = useState(0);
-  const canvasRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const imageInputRef = useRef(null);
+    const App = () => {
+      const canvasRef = useRef(null);
+      const [images, setImages] = useState([]);
+      const [texts, setTexts] = useState([]);
+      const [selectedTextIndex, setSelectedTextIndex] = useState(null);
+      const [isDragging, setIsDragging] = useState(false);
+      const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
+      const [showToolbar, setShowToolbar] = useState(true);
+      const [exportFormat, setExportFormat] = useState('jpeg');
+      const [exportTransparentBg, setExportTransparentBg] = useState(false);
+      const [availableFonts, setAvailableFonts] = useState([
+        'Arial',
+        'Helvetica',
+        'Times New Roman',
+        'Courier New',
+        'Verdana',
+        'Georgia',
+        'Palatino',
+        'Garamond',
+        'Bookman',
+        'Comic Sans MS',
+        'Trebuchet MS',
+        'Arial Black',
+        'Impact',
+      ]);
 
-  const presetFonts = [
-    'Arial',
-    'Helvetica',
-    'Times New Roman',
-    'Courier New',
-    'Verdana',
-    'Georgia',
-    'Palatino',
-    'Garamond',
-    'Bookman',
-    'Comic Sans MS',
-    'Trebuchet MS',
-    'Arial Black',
-    'Impact',
-  ];
+      // 模拟字体上传和保存
+      const handleFontUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
 
-  const handleExportTransparentBgChange = (e) => {
-    setExportTransparentBg(e.target.checked);
-  };
-
-  const handleExportFileNameChange = (e) => {
-    setExportFileName(e.target.value);
-  };
-
-  const handleFontChange = (e) => {
-    setSelectedFont(e.target.value);
-    if (selectedTextIndex !== null) {
-      setTexts(
-        texts.map((text, i) =>
-          i === selectedTextIndex ? { ...text, font: e.target.value } : text
-        )
-      );
-    }
-  };
-
-  const handleCustomFontUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const fontName = file.name.split('.')[0];
-        const newStyle = document.createElement('style');
-        newStyle.appendChild(
-          document.createTextNode(`
-          @font-face {
-            font-family: '${fontName}';
-            src: url(${event.target.result}) format('truetype');
-          }
-        `)
-        );
-        document.head.appendChild(newStyle);
-
-        setCustomFont(event.target.result);
-        setCustomFontName(fontName);
-        setSelectedFont(fontName);
-        if (selectedTextIndex !== null) {
-          setTexts(
-            texts.map((text, i) =>
-              i === selectedTextIndex ? { ...text, font: fontName } : text
-            )
-          );
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleAddText = () => {
-    const newText = {
-      content: '新文本',
-      x: 150,
-      y: 150,
-      size: 30,
-      color: '#000000',
-      font: selectedFont,
-      align: 'horizontal',
-    };
-    setTexts([...texts, newText]);
-    setSelectedTextIndex(texts.length);
-  };
-
-  const handleTextChange = (e) => {
-    if (selectedTextIndex !== null) {
-      setTexts(
-        texts.map((text, i) =>
-          i === selectedTextIndex
-            ? { ...text, content: e.target.value }
-            : text
-        )
-      );
-    }
-  };
-
-  const handleTextSizeChange = (e) => {
-    const newSize = parseInt(e.target.value, 10);
-    if (selectedTextIndex !== null) {
-      setTexts(
-        texts.map((text, i) =>
-          i === selectedTextIndex ? { ...text, size: newSize } : text
-        )
-      );
-    }
-  };
-
-  const handleTextColorChange = (e) => {
-    if (selectedTextIndex !== null) {
-      setTexts(
-        texts.map((text, i) =>
-          i === selectedTextIndex ? { ...text, color: e.target.value } : text
-        )
-      );
-    }
-  };
-
-  const handleTextAlignChange = (e) => {
-    if (selectedTextIndex !== null) {
-      setTexts(
-        texts.map((text, i) =>
-          i === selectedTextIndex ? { ...text, align: e.target.value } : text
-        )
-      );
-    }
-  };
-
-  const handleImageResize = (newWidth, newHeight) => {
-    if (selectedImageIndex !== null) {
-      setImages(
-        images.map((image, i) =>
-          i === selectedImageIndex
-            ? {
-                ...image,
-                width: newWidth,
-                height: newHeight,
-                x: image.x - (newWidth - image.width) / 2,
-                y: image.y - (newHeight - image.height) / 2,
-              }
-            : image
-        )
-      );
-    }
-  };
-
-  const handleTextResize = (newSize) => {
-    if (selectedTextIndex !== null) {
-      setTexts(
-        texts.map((text, i) =>
-          i === selectedTextIndex ? { ...text, size: newSize } : text
-        )
-      );
-    }
-  };
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = canvasRef.current;
-          const scale = Math.min(
-            canvas.width / img.width,
-            canvas.height / img.height
-          );
-          const initialWidth = img.width * scale;
-          const initialHeight = img.height * scale;
-          const x = canvas.width / 2 - initialWidth / 2;
-          const y = canvas.height / 2 - initialHeight / 2;
-          const newImage = {
-            src: event.target.result,
-            originalWidth: img.width,
-            originalHeight: img.height,
-            x,
-            y,
-            width: initialWidth,
-            height: initialHeight,
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const fontName = file.name.split('.')[0];
+          const newFont = {
+            name: fontName,
+            url: e.target.result,
           };
-          setImages([newImage]);
-          setSelectedImageIndex(0);
-          setSelectedTextIndex(null);
-        };
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
-  const handleCanvasStart = (e) => {
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const touches = e.touches;
-    const x = touches ? touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = touches ? touches[0].clientY - rect.top : e.clientY - rect.top;
-    let clickedOnText = false;
+          // 模拟保存字体到 /fonts 目录
+          // 实际应用中，你需要将字体文件上传到服务器
+          const updatedFonts = [...availableFonts, fontName];
+          setAvailableFonts(updatedFonts);
 
-    for (let i = texts.length - 1; i >= 0; i--) {
-      const text = texts[i];
-      const textWidth = canvasRef.current
-        .getContext('2d')
-        .measureText(text.content).width;
-      const textHeight = text.size;
-
-      if (
-        x >= text.x - textWidth / 2 - 10 &&
-        x <= text.x + textWidth / 2 + 10 &&
-        y >= text.y - textHeight / 2 - 10 &&
-        y <= text.y + textHeight / 2 + 10
-      ) {
-        setSelectedTextIndex(i);
-        setSelectedImageIndex(null);
-        setIsDragging(true);
-        setDragStartPos({ x: x - text.x, y: y - text.y });
-        clickedOnText = true;
-        break;
-      }
-    }
-
-    if (!clickedOnText) {
-      let clickedOnImage = false;
-      for (let i = images.length - 1; i >= 0; i--) {
-        const image = images[i];
-        if (
-          x >= image.x - 10 &&
-          x <= image.x + image.width + 10 &&
-          y >= image.y - 10 &&
-          y <= image.y + image.height + 10
-        ) {
-          setSelectedImageIndex(i);
-          setSelectedTextIndex(null);
-          setIsDragging(true);
-          setDragStartPos({ x: x - image.x, y: y - image.y });
-          clickedOnImage = true;
-          break;
+          // 将新字体添加到页面中
+          const newStyle = document.createElement('style');
+          newStyle.appendChild(
+            document.createTextNode(`
+        @font-face {
+          font-family: '${fontName}';
+          src: url('${newFont.url}') format('truetype');
         }
-      }
-      if (!clickedOnImage) {
+      `)
+          );
+          document.head.appendChild(newStyle);
+
+          // 更新字体选择列表
+          setTexts(
+            texts.map((text) => ({
+              ...text,
+              fontFamily: updatedFonts.includes(text.fontFamily)
+                ? text.fontFamily
+                : availableFonts[0],
+            }))
+          );
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = canvasRef.current;
+            const scale = canvas.width / img.width;
+            setImages([
+              {
+                imageData: img,
+                x: 0,
+                y: 0,
+                width: img.width,
+                height: img.height,
+                scaledWidth: img.width * scale,
+                scaledHeight: img.height * scale,
+              },
+            ]);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const handleTextChange = (index, newText) => {
+        setTexts(
+          texts.map((text, i) =>
+            i === index ? { ...text, content: newText } : text
+          )
+        );
+      };
+
+      const handleTextResize = (index, newSize) => {
+        setTexts(
+          texts.map((text, i) =>
+            i === index ? { ...text, fontSize: newSize } : text
+          )
+        );
+      };
+
+      const handleTextDelete = (index) => {
+        setTexts(texts.filter((_, i) => i !== index));
         setSelectedTextIndex(null);
-        setSelectedImageIndex(null);
-      }
-    }
+      };
 
-    if (touches && touches.length === 2 && selectedImageIndex !== null) {
-      setIsScaling(true);
-      const dist = Math.hypot(
-        touches[0].clientX - touches[1].clientX,
-        touches[0].clientY - touches[1].clientY
-      );
-      setScaleStartDistance(dist);
-    } else {
-      setIsScaling(false);
-    }
-  };
+      const addText = () => {
+        const canvas = canvasRef.current;
+        setTexts([
+          ...texts,
+          {
+            content: '新文本',
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            fontSize: 50,
+            color: '#000000',
+            fontFamily: 'Arial',
+          },
+        ]);
+      };
 
-  const handleCanvasMove = (e) => {
-    if (isDragging) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const touch = e.touches ? e.touches[0] : e;
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
+      const handleCanvasMouseDown = (event) => {
+        const canvas = canvasRef.current;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (event.clientX - rect.left) * scaleX;
+        const y = (event.clientY - rect.top) * scaleY;
 
-      if (selectedTextIndex !== null) {
+        let clickedTextIndex = null;
+        texts.forEach((text, index) => {
+          const ctx = canvas.getContext('2d');
+          const scale = images[0] ? canvas.width / images[0].width : 1;
+          const scaledFontSize = text.fontSize * scale;
+          ctx.font = `${scaledFontSize}px ${text.fontFamily}`;
+          const textWidth = ctx.measureText(text.content).width;
+          const textHeight = scaledFontSize;
+
+          if (
+            x >= text.x &&
+            x <= text.x + textWidth &&
+            y >= text.y &&
+            y <= text.y + textHeight
+          ) {
+            clickedTextIndex = index;
+          }
+        });
+
+        if (clickedTextIndex !== null) {
+          setSelectedTextIndex(clickedTextIndex);
+          setIsDragging(true);
+          setDragStartPos({
+            x: x - texts[clickedTextIndex].x,
+            y: y - texts[clickedTextIndex].y,
+          });
+        } else {
+          setSelectedTextIndex(null);
+        }
+      };
+
+      const handleCanvasMouseMove = (event) => {
+        if (!isDragging || selectedTextIndex === null) return;
+
+        const canvas = canvasRef.current;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (event.clientX - rect.left) * scaleX;
+        const y = (event.clientY - rect.top) * scaleY;
+
         setTexts(
           texts.map((text, i) =>
             i === selectedTextIndex
@@ -288,289 +189,263 @@ function App() {
               : text
           )
         );
-      } else if (selectedImageIndex !== null) {
-        setImages(
-          images.map((image, i) =>
-            i === selectedImageIndex
-              ? { ...image, x: x - dragStartPos.x, y: y - dragStartPos.y }
-              : image
-          )
-        );
-      }
-    }
+      };
 
-    if (
-      isScaling &&
-      e.touches &&
-      e.touches.length === 2 &&
-      selectedImageIndex !== null
-    ) {
-      const touches = e.touches;
-      const dist = Math.hypot(
-        touches[0].clientX - touches[1].clientX,
-        touches[0].clientY - touches[1].clientY
-      );
-      const scaleFactor = dist / scaleStartDistance;
-      const image = images[selectedImageIndex];
-      const newWidth = image.originalWidth * scaleFactor;
-      const newHeight = image.originalHeight * scaleFactor;
-      handleImageResize(newWidth, newHeight);
-    }
-  };
+      const handleCanvasMouseUp = () => {
+        setIsDragging(false);
+      };
 
-  const handleCanvasEnd = () => {
-    setIsDragging(false);
-    setIsScaling(false);
-  };
+      const handleCanvasMouseOut = () => {
+        setIsDragging(false);
+      };
 
-  const handleCanvasCancel = () => {
-    setIsDragging(false);
-    setIsScaling(false);
-  };
+      const handleExport = () => {
+        const canvas = canvasRef.current;
+        const scale = images[0] ? canvas.width / images[0].width : 1;
 
-  const handleExportCanvas = () => {
-    if (images.length === 0) {
-      alert('请先上传图片');
-      return;
-    }
+        // 临时画布用于处理原始尺寸和透明背景
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = images[0]?.width || canvas.width;
+        tempCanvas.height = images[0]?.height || canvas.height;
 
-    const originalImage = images[0];
-    const canvas = document.createElement('canvas');
-    canvas.width = originalImage.originalWidth;
-    canvas.height = originalImage.originalHeight;
-    const ctx = canvas.getContext('2d');
+        if (!exportTransparentBg) {
+          // 填充背景色
+          tempCtx.fillStyle = '#FFFFFF'; // 白色背景
+          tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        }
 
-    const drawElements = () => {
-      const img = new Image();
-      img.onload = () => {
-        const scaleX = canvas.width / canvasRef.current.width;
-        const scaleY = canvas.height / canvasRef.current.height;
+        // 绘制原始尺寸的图片
+        images.forEach((image) => {
+          tempCtx.drawImage(image.imageData, 0, 0, image.width, image.height);
+        });
 
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
+        // 绘制文字
         texts.forEach((text) => {
-          ctx.font = `${text.size * scaleY}px ${text.font}`;
-          ctx.fillStyle = text.color;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(
+          const scaledFontSize = text.fontSize;
+          tempCtx.font = `${scaledFontSize}px ${text.fontFamily}`;
+          tempCtx.fillStyle = text.color;
+          tempCtx.fillText(
             text.content,
-            text.x * scaleX,
-            text.y * scaleY
+            text.x * scale,
+            text.y * scale + scaledFontSize
           );
         });
 
-        const dataURL = canvas.toDataURL('image/png');
-        downloadImage(dataURL, exportFileName);
+        // 导出图片
+        const dataURL = tempCanvas.toDataURL(`image/${exportFormat}`);
+        const link = document.createElement('a');
+        link.download = `导出图片.${exportFormat}`;
+        link.href = dataURL;
+        link.click();
       };
-      img.onerror = () => {
-        alert('图片加载失败');
-      };
-      img.src = originalImage.src;
+
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        const draw = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // 绘制缩放后的图片
+          images.forEach((image) => {
+            ctx.drawImage(
+              image.imageData,
+              image.x,
+              image.y,
+              image.scaledWidth,
+              image.scaledHeight
+            );
+          });
+
+          // 绘制文字
+          texts.forEach((text, index) => {
+            const scale = images[0] ? canvas.width / images[0].width : 1;
+            const scaledFontSize = text.fontSize * scale;
+            ctx.font = `${scaledFontSize}px ${text.fontFamily}`;
+            ctx.fillStyle = text.color;
+            ctx.fillText(text.content, text.x, text.y + scaledFontSize);
+
+            if (index === selectedTextIndex) {
+              ctx.strokeStyle = 'blue';
+              ctx.strokeRect(
+                text.x,
+                text.y,
+                ctx.measureText(text.content).width,
+                scaledFontSize
+              );
+            }
+          });
+        };
+
+        draw();
+      }, [images, texts, selectedTextIndex]);
+
+      return (
+        <div className="app-container">
+          <div className="edit-area">
+            <canvas
+              ref={canvasRef}
+              width={375}
+              height={600}
+              onMouseDown={handleCanvasMouseDown}
+              onMouseMove={handleCanvasMouseMove}
+              onMouseUp={handleCanvasMouseUp}
+              onMouseOut={handleCanvasMouseOut}
+            />
+          </div>
+
+          <button
+            className="toolbar-toggle"
+            onClick={() => setShowToolbar(!showToolbar)}
+          >
+            {showToolbar ? '隐藏工具栏' : '显示工具栏'}
+          </button>
+
+          {showToolbar && (
+            <div className="toolbar">
+              <div className="toolbar-section">
+                <div className="toolbar-group">
+                  <label htmlFor="fontUpload">上传字体:</label>
+                  <input
+                    type="file"
+                    id="fontUpload"
+                    accept=".ttf,.otf"
+                    onChange={handleFontUpload}
+                  />
+                </div>
+              </div>
+              <div className="toolbar-section">
+                <div className="toolbar-group">
+                  <label htmlFor="imageUpload">上传图片:</label>
+                  <input
+                    type="file"
+                    id="imageUpload"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                  />
+                </div>
+              </div>
+
+              <div className="toolbar-section">
+                <div className="toolbar-group">
+                  <button onClick={addText}>添加文本</button>
+                </div>
+              </div>
+
+              {texts.map((text, index) => (
+                <div key={index} className="toolbar-section">
+                  <div className="toolbar-title">编辑文本 {index + 1}</div>
+                  <div className="toolbar-group">
+                    <label htmlFor={`text-content-${index}`}>内容:</label>
+                    <input
+                      type="text"
+                      id={`text-content-${index}`}
+                      value={text.content}
+                      onChange={(e) => handleTextChange(index, e.target.value)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedTextIndex(index);
+                      }}
+                    />
+                  </div>
+                  <div className="toolbar-group text-controls">
+                    <label htmlFor={`text-size-${index}`}>大小:</label>
+                    <input
+                      type="number"
+                      id={`text-size-${index}`}
+                      value={text.fontSize}
+                      min="1"
+                      onChange={(e) =>
+                        handleTextResize(index, parseInt(e.target.value, 10))
+                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedTextIndex(index);
+                      }}
+                    />
+                    <label htmlFor={`text-color-${index}`}>颜色:</label>
+                    <input
+                      type="color"
+                      id={`text-color-${index}`}
+                      value={text.color}
+                      onChange={(e) =>
+                        setTexts(
+                          texts.map((t, i) =>
+                            i === index ? { ...t, color: e.target.value } : t
+                          )
+                        )
+                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedTextIndex(index);
+                      }}
+                    />
+                    <label htmlFor={`text-font-${index}`}>字体:</label>
+                    <select
+                      id={`text-font-${index}`}
+                      value={text.fontFamily}
+                      onChange={(e) =>
+                        setTexts(
+                          texts.map((t, i) =>
+                            i === index ? { ...t, fontFamily: e.target.value } : t
+                          )
+                        )
+                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedTextIndex(index);
+                      }}
+                    >
+                      {availableFonts.map((font) => (
+                        <option key={font} value={font}>
+                          {font}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="toolbar-group">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTextDelete(index);
+                      }}
+                    >
+                      删除
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              <div className="toolbar-section">
+                <div className="toolbar-title">导出设置</div>
+                <div className="toolbar-group export-controls">
+                  <label htmlFor="export-format">格式:</label>
+                  <select
+                    id="export-format"
+                    value={exportFormat}
+                    onChange={(e) => setExportFormat(e.target.value)}
+                  >
+                    <option value="jpeg">JPEG</option>
+                    <option value="png">PNG</option>
+                  </select>
+                  <label htmlFor="export-transparent-bg">透明背景:</label>
+                  <input
+                    type="checkbox"
+                    id="export-transparent-bg"
+                    checked={exportTransparentBg}
+                    onChange={(e) => setExportTransparentBg(e.target.checked)}
+                  />
+                </div>
+                <div className="toolbar-group">
+                  <button onClick={handleExport}>导出</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
     };
 
-    if (!exportTransparentBg) {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-    drawElements();
-  };
-
-  const downloadImage = (dataURL, filename) => {
-    const link = document.createElement('a');
-    link.href = dataURL;
-    link.download = `${filename}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleDeleteText = () => {
-    if (selectedTextIndex !== null) {
-      const newTexts = texts.filter(
-        (_, index) => index !== selectedTextIndex
-      );
-      setTexts(newTexts);
-      setSelectedTextIndex(null);
-    }
-  };
-
-  const handleDeleteImage = () => {
-    if (selectedImageIndex !== null) {
-      const newImages = images.filter(
-        (_, index) => index !== selectedImageIndex
-      );
-      setImages(newImages);
-      setSelectedImageIndex(null);
-    }
-  };
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    images.forEach((image) => {
-      const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, image.x, image.y, image.width, image.height);
-        texts.forEach((text) => {
-          ctx.font = `${text.size}px ${text.font}`;
-          ctx.fillStyle = text.color;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(text.content, text.x, text.y);
-        });
-      };
-      img.src = image.src;
-    });
-  }, [texts, images]);
-
-  return (
-    <div className="app-container">
-      <div className="edit-area">
-        <canvas
-          ref={canvasRef}
-          width={375}
-          height={600}
-          onMouseDown={handleCanvasStart}
-          onMouseMove={handleCanvasMove}
-          onMouseUp={handleCanvasEnd}
-          onMouseOut={handleCanvasCancel}
-          onTouchStart={handleCanvasStart}
-          onTouchMove={handleCanvasMove}
-          onTouchEnd={handleCanvasEnd}
-          onTouchCancel={handleCanvasCancel}
-        />
-      </div>
-      <button
-        className="toolbar-toggle"
-        onClick={() => setShowToolbar(!showToolbar)}
-      >
-        {showToolbar ? '隐藏工具栏' : '显示工具栏'}
-      </button>
-      {showToolbar ? (
-        <div className="toolbar">
-          <div className="toolbar-section">
-            <h2 className="toolbar-title">图片工具</h2>
-            <div className="toolbar-group">
-              <button onClick={() => imageInputRef.current.click()}>
-                添加图片
-              </button>
-              <input
-                type="file"
-                style={{ display: 'none' }}
-                ref={imageInputRef}
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-              <button
-                onClick={handleDeleteImage}
-                disabled={selectedImageIndex === null}
-              >
-                删除选中图片
-              </button>
-            </div>
-          </div>
-
-          <div className="toolbar-section">
-            <h2 className="toolbar-title">文字工具</h2>
-            <div className="toolbar-group">
-              <button onClick={handleAddText}>添加文字</button>
-              <button
-                onClick={handleDeleteText}
-                disabled={selectedTextIndex === null}
-              >
-                删除选中文字
-              </button>
-            </div>
-            {selectedTextIndex !== null ? (
-              <div className="toolbar-group">
-                <label>文字内容:</label>
-                <input
-                  type="text"
-                  value={texts[selectedTextIndex].content}
-                  onChange={handleTextChange}
-                />
-              </div>
-            ) : null}
-            {selectedTextIndex !== null ? (
-              <div className="toolbar-group">
-                <label>字体:</label>
-                <select value={selectedFont} onChange={handleFontChange}>
-                  {presetFonts.map((font) => (
-                    <option key={font} value={font}>
-                      {font}
-                    </option>
-                  ))}
-                  {customFontName && (
-                    <option value={customFontName}>{customFontName} (自定义)</option>
-                  )}
-                </select>
-                <button onClick={() => fileInputRef.current.click()}>
-                  上传自定义字体
-                </button>
-                <input
-                  type="file"
-                  style={{ display: 'none' }}
-                  ref={fileInputRef}
-                  accept=".ttf,.otf"
-                  onChange={handleCustomFontUpload}
-                />
-              </div>
-            ) : null}
-            {selectedTextIndex !== null ? (
-              <div className="toolbar-group">
-                <label>大小:</label>
-                <input
-                  type="number"
-                  value={texts[selectedTextIndex].size}
-                  onChange={handleTextSizeChange}
-                />
-                <label>颜色:</label>
-                <input
-                  type="color"
-                  value={texts[selectedTextIndex].color}
-                  onChange={handleTextColorChange}
-                />
-                <label>对齐:</label>
-                <select
-                  value={texts[selectedTextIndex].align}
-                  onChange={handleTextAlignChange}
-                >
-                  <option value="horizontal">水平</option>
-                  <option value="vertical">垂直</option>
-                </select>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="toolbar-section">
-            <h2 className="toolbar-title">导出设置</h2>
-            <div className="toolbar-group">
-              <label>文件名:</label>
-              <input
-                type="text"
-                value={exportFileName}
-                onChange={handleExportFileNameChange}
-              />
-            </div>
-            <div className="toolbar-group">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={exportTransparentBg}
-                  onChange={handleExportTransparentBgChange}
-                />
-                透明背景
-              </label>
-              <button onClick={handleExportCanvas}>导出画布</button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-export default App;
+    export default App;
