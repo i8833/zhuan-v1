@@ -1,0 +1,192 @@
+body,
+    html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f0f0;
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      min-height: 100vh;
+      padding: 10px;
+      box-sizing: border-box;
+      background-color: #f0f0f0;
+      overflow-x: hidden;
+    }
+
+    .edit-area {
+      position: relative;
+      width: 100%;
+      max-width: 375px;
+      margin: 0 auto;
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      background-color: white;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      height: 500px;
+    }
+
+    canvas {
+      display: block;
+      border: 1px solid #ddd;
+      background-color: white;
+      width: 100%;
+      max-width: 375px;
+      height: 500px;
+      touch-action: none;
+      will-change: transform;
+      border-radius: 4px;
+    }
+
+    .toolbar-toggle {
+      position: relative;
+      margin: 5px 0;
+      padding: 8px 16px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      z-index: 2;
+    }
+
+    .toolbar {
+      width: 100%;
+      max-width: 375px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      margin-top: 10px;
+      z-index: 2;
+      box-sizing: border-box;
+    }
+
+    .toolbar-section {
+      margin-bottom: 10px;
+    }
+
+    .toolbar-title {
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-group label {
+      margin-right: 5px;
+      font-size: 0.8rem;
+    }
+
+    .toolbar-group input[type='number'],
+    .toolbar-group input[type='color'],
+    .toolbar-group select,
+    .toolbar-group input[type='file'] {
+      padding: 3px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-right: 5px;
+      font-size: 0.8rem;
+    }
+
+    .toolbar-group input[type='file'] {
+      width: auto;
+    }
+
+    .toolbar-group input[type='number'] {
+      width: 50px;
+    }
+
+    .toolbar-group button {
+      padding: 4px 8px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      touch-action: manipulation;
+    }
+
+    .toolbar-group button:hover {
+      background-color: #367c39;
+    }
+
+    .toolbar-group p {
+      margin-left: 5px;
+      font-size: 0.7rem;
+      color: #777;
+    }
+
+    .text-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .text-controls > * {
+      margin-right: 5px;
+    }
+
+    .export-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .export-controls > * {
+      margin-right: 5px;
+    }
+
+    @media (max-width: 480px) {
+      .edit-area {
+        margin: 5px auto;
+        touch-action: none;
+      }
+      
+      canvas {
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      .toolbar-group button {
+        min-height: 36px;
+        min-width: 36px;
+        padding: 8px 12px;
+      }
+      
+      .toolbar-group input,
+      .toolbar-group select {
+        min-height: 36px;
+        padding: 4px 8px;
+      }
+      
+      .toolbar-toggle {
+        margin-top: 5px;
+      }
+      
+      .toolbar {
+        padding: 5px;
+      }
+    }
+
+    .toolbar-group button:active {
+      transform: scale(0.98);
+      transition: transform 0.1s;
+    }
