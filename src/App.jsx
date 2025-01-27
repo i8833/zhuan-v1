@@ -26,6 +26,9 @@ import React, { useState, useRef, useEffect } from 'react';
         'Arial Black',
         'Impact',
       ]);
+      const [isPinching, setIsPinching] = useState(false);
+      const [initialPinchDistance, setInitialPinchDistance] = useState(0);
+      const [initialFontSize, setInitialFontSize] = useState(0);
 
       // 模拟字体上传和保存
       const handleFontUpload = (event) => {
@@ -199,6 +202,104 @@ import React, { useState, useRef, useEffect } from 'react';
         setIsDragging(false);
       };
 
+      const handleTouchStart = (event) => {
+        const canvas = canvasRef.current;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        const touches = Array.from(event.touches).map((touch) => ({
+          x: (touch.clientX - rect.left) * scaleX,
+          y: (touch.clientY - rect.top) * scaleY,
+        }));
+
+        let clickedTextIndex = null;
+        texts.forEach((text, index) => {
+          const ctx = canvas.getContext('2d');
+          const scale = images[0] ? canvas.width / images[0].width : 1;
+          const scaledFontSize = text.fontSize * scale;
+          ctx.font = `${scaledFontSize}px ${text.fontFamily}`;
+          const textWidth = ctx.measureText(text.content).width;
+          const textHeight = scaledFontSize;
+
+          if (
+            touches[0].x >= text.x &&
+            touches[0].x <= text.x + textWidth &&
+            touches[0].y >= text.y &&
+            touches[0].y <= text.y + textHeight
+          ) {
+            clickedTextIndex = index;
+          }
+        });
+
+        if (clickedTextIndex !== null) {
+          setSelectedTextIndex(clickedTextIndex);
+          if (touches.length === 1) {
+            setIsDragging(true);
+            setDragStartPos({
+              x: touches[0].x - texts[clickedTextIndex].x,
+              y: touches[0].y - texts[clickedTextIndex].y,
+            });
+          } else if (touches.length === 2) {
+            setIsPinching(true);
+            const dist = Math.hypot(
+              touches[1].x - touches[0].x,
+              touches[1].y - touches[0].y
+            );
+            setInitialPinchDistance(dist);
+            setInitialFontSize(texts[clickedTextIndex].fontSize);
+          }
+        } else {
+          setSelectedTextIndex(null);
+        }
+      };
+
+      const handleTouchMove = (event) => {
+        if (selectedTextIndex === null) return;
+
+        const canvas = canvasRef.current;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        const touches = Array.from(event.touches).map((touch) => ({
+          x: (touch.clientX - rect.left) * scaleX,
+          y: (touch.clientY - rect.top) * scaleY,
+        }));
+
+        if (isDragging && touches.length === 1) {
+          setTexts(
+            texts.map((text, i) =>
+              i === selectedTextIndex
+                ? {
+                    ...text,
+                    x: touches[0].x - dragStartPos.x,
+                    y: touches[0].y - dragStartPos.y,
+                  }
+                : text
+            )
+          );
+        } else if (isPinching && touches.length === 2) {
+          const dist = Math.hypot(
+            touches[1].x - touches[0].x,
+            touches[1].y - touches[0].y
+          );
+          const scaleFactor = dist / initialPinchDistance;
+          setTexts(
+            texts.map((text, i) =>
+              i === selectedTextIndex
+                ? { ...text, fontSize: initialFontSize * scaleFactor }
+                : text
+            )
+          );
+        }
+      };
+
+      const handleTouchEnd = () => {
+        setIsDragging(false);
+        setIsPinching(false);
+      };
+
       const handleExport = () => {
         const canvas = canvasRef.current;
         const scale = images[0] ? canvas.width / images[0].width : 1;
@@ -293,6 +394,9 @@ import React, { useState, useRef, useEffect } from 'react';
               onMouseMove={handleCanvasMouseMove}
               onMouseUp={handleCanvasMouseUp}
               onMouseOut={handleCanvasMouseOut}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
             />
           </div>
 
