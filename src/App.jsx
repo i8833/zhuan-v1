@@ -17,19 +17,12 @@ const App = () => {
   const [exportFormat, setExportFormat] = useState('jpeg');
   const [exportTransparentBg, setExportTransparentBg] = useState(false);
   const [availableFonts, setAvailableFonts] = useState([
-    'Arial',
-    'Helvetica',
-    'Times New Roman',
-    'Courier New',
-    'Verdana',
-    'Georgia',
-    'Palatino',
-    'Garamond',
-    'Bookman',
-    'Comic Sans MS',
-    'Trebuchet MS',
-    'Arial Black',
-    'Impact',
+    '方正小篆',
+    '繁篆',
+    '金文大篆',
+    '汉仪篆书',
+    '九叠篆',
+    '甲骨文'
   ]);
   const [isPinching, setIsPinching] = useState(false);
   const [initialPinchDistance, setInitialPinchDistance] = useState(0);
@@ -129,16 +122,36 @@ const App = () => {
 
   const addText = () => {
     const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const defaultFontSize = 50;
+    const defaultText = '新文本';
+    
+    // 设置字体以便测量文本尺寸
+    ctx.font = `${defaultFontSize}px Arial`;
+    const textMetrics = ctx.measureText(defaultText);
+    
+    // 计算文本的中心位置
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    // 根据文本方向调整位置
+    const x = textDirection === 'horizontal' 
+      ? centerX - textMetrics.width / 2 
+      : centerX;
+    const y = textDirection === 'horizontal'
+      ? centerY
+      : centerY - (defaultText.length * defaultFontSize) / 2;
+    
     setTexts([
       ...texts,
       {
-        content: '新文本',
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-        fontSize: 50,
+        content: defaultText,
+        x,
+        y,
+        fontSize: defaultFontSize,
         color: '#000000',
         fontFamily: 'Arial',
-        direction: 'horizontal' // 默认横排
+        direction: textDirection
       },
     ]);
   };
@@ -533,29 +546,6 @@ const App = () => {
 
       {showToolbar && (
         <div className="toolbar">
-          <div className="toolbar-section">
-            <div className="toolbar-group">
-              <label htmlFor="fontUpload">上传字体:</label>
-              <input
-                type="file"
-                id="fontUpload"
-                accept=".ttf,.otf"
-                onChange={handleFontUpload}
-              />
-            </div>
-          </div>
-          <div className="toolbar-section">
-            <div className="toolbar-group">
-              <label htmlFor="imageUpload">上传图片:</label>
-              <input
-                type="file"
-                id="imageUpload"
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-            </div>
-          </div>
-
           <div className="toolbar-section">
             <div className="toolbar-group">
               <button onClick={addText}>添加文本</button>
