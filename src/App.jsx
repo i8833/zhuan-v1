@@ -16,21 +16,7 @@ const App = () => {
   const [showToolbar, setShowToolbar] = useState(true);
   const [exportFormat, setExportFormat] = useState('jpeg');
   const [exportTransparentBg, setExportTransparentBg] = useState(false);
-  const [availableFonts, setAvailableFonts] = useState([
-    'Arial',
-    'Helvetica',
-    'Times New Roman',
-    'Courier New',
-    'Verdana',
-    'Georgia',
-    'Palatino',
-    'Garamond',
-    'Bookman',
-    'Comic Sans MS',
-    'Trebuchet MS',
-    'Arial Black',
-    'Impact',
-  ]);
+  const [availableFonts, setAvailableFonts] = useState([]);
   const [isPinching, setIsPinching] = useState(false);
   const [initialPinchDistance, setInitialPinchDistance] = useState(0);
   const [initialFontSize, setInitialFontSize] = useState(0);
@@ -88,12 +74,16 @@ const App = () => {
       const img = new Image();
       img.onload = () => {
         const canvas = canvasRef.current;
-        const scale = canvas.width / img.width;
+        // 计算适配屏幕的缩放比例
+        const scaleWidth = canvas.width / img.width;
+        const scaleHeight = canvas.height / img.height;
+        const scale = Math.min(scaleWidth, scaleHeight, 1); // 限制最大缩放为1，保持原始尺寸
+
         setImages([
           {
             imageData: img,
-            x: 0,
-            y: 0,
+            x: (canvas.width - img.width * scale) / 2, // 居中显示
+            y: (canvas.height - img.height * scale) / 2,
             width: img.width,
             height: img.height,
             scaledWidth: img.width * scale,
@@ -129,16 +119,24 @@ const App = () => {
 
   const addText = () => {
     const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const fontSize = 50;
+    
+    // 设置字体以便测量文本宽度
+    ctx.font = `${fontSize}px Arial`;
+    const text = '新文本';
+    const textMetrics = ctx.measureText(text);
+    
     setTexts([
       ...texts,
       {
-        content: '新文本',
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-        fontSize: 50,
+        content: text,
+        x: (canvas.width - textMetrics.width) / 2, // 水平居中
+        y: canvas.height / 2 - fontSize / 2, // 垂直居中
+        fontSize: fontSize,
         color: '#000000',
         fontFamily: 'Arial',
-        direction: 'horizontal' // 默认横排
+        direction: 'horizontal'
       },
     ]);
   };
@@ -533,17 +531,6 @@ const App = () => {
 
       {showToolbar && (
         <div className="toolbar">
-          <div className="toolbar-section">
-            <div className="toolbar-group">
-              <label htmlFor="fontUpload">上传字体:</label>
-              <input
-                type="file"
-                id="fontUpload"
-                accept=".ttf,.otf"
-                onChange={handleFontUpload}
-              />
-            </div>
-          </div>
           <div className="toolbar-section">
             <div className="toolbar-group">
               <label htmlFor="imageUpload">上传图片:</label>
