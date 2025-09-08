@@ -1,4 +1,12 @@
 export const localFonts = [
+  { name: '汉仪小楷', path: '/fonts/HanyiSentyFlorCalligraphy.ttf' },
+  { name: '汉仪唐朝', path: '/fonts/HanyiSentyTang.ttf' },
+  { name: '汉仪永乐', path: '/fonts/HanyiSentyYongleEncyclopedia.ttf' },
+  { name: '汉仪赵体', path: '/fonts/HanyiSentyZhao.ttf' },
+  { name: '新蒂君子兰', path: '/fonts/SentyOrchid.ttf' },
+  { name: '汉仪文体', path: '/fonts/SentyWEN2017.ttf' },
+  
+  
   { name: '方正小篆', path: '/fonts/fangzheng.ttf' },
   { name: '繁篆', path: '/fonts/fanzhuan.ttf' },
   { name: '金文大篆', path: '/fonts/dazhuan.ttf' },
